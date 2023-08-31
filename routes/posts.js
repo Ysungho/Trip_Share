@@ -1,3 +1,6 @@
+// 'routes/user.js의 구성과 크게 다르지 않습니다. 
+// 특별하게 다른 부분은 주석을 첨부했습니다. 
+
 const express = require("express");
 const Post = require("../models/Post");
 const User = require("../models/User");
@@ -39,6 +42,7 @@ const isLoggedIn = (req, res, next) => {
 };
 
 /* Routers */
+// User 컬렉션에서 findById()를 통해서 사용자를 조회함
 router.get("/", isLoggedIn, (req, res) => {
     User.findById(req.user._id) // 친구들의 게시글
         .populate({
@@ -79,7 +83,7 @@ router.get("/", isLoggedIn, (req, res) => {
 });
 
 router.get("/post/:id/like", isLoggedIn, (req, res) => {
-    User.findById(req.user._id, (userErr, user) => {
+    User.findById(req.user._id, (userErr, user) => {// User 컬렉션에서 findById()를 통해서 사용자를 조회함
         if (userErr) {
             console.log(userErr);
             req.flash(
@@ -87,7 +91,7 @@ router.get("/post/:id/like", isLoggedIn, (req, res) => {
             );
             rse.redirect("back");
         } else {
-            Post.findById(req.params.id, (postErr, post) => {
+            Post.findById(req.params.id, (postErr, post) => {// User 컬렉션에서 findById()를 통해서 사용자를 조회함
                 if (postErr) {
                     console.log(postErr);
                     req.flash(
@@ -118,7 +122,7 @@ router.get("/post/:id/like", isLoggedIn, (req, res) => {
 });
 
 router.get("/post/:postid/comments/:commentid/like", isLoggedIn, (req, res) => {
-    User.findById(req.user._id, (userErr, user) => {
+    User.findById(req.user._id, (userErr, user) => {// User 컬렉션에서 findById()를 통해서 사용자를 조회함
         if (userErr) {
             console.log(userErr);
             req.flash(
@@ -127,7 +131,7 @@ router.get("/post/:postid/comments/:commentid/like", isLoggedIn, (req, res) => {
             );
             res.redirect("back");
         } else {
-            Comment.findById(req.params.commentid, (commentErr, comment) => {
+            Comment.findById(req.params.commentid, (commentErr, comment) => {// User 컬렉션에서 findById()를 통해서 사용자를 조회함
                 if (commentErr) {
                     console.log(commentErr);
                     req.flash(
@@ -156,11 +160,13 @@ router.get("/post/new", isLoggedIn, (req, res) => {
     res.render("posts/new");
 });
 
+// 다른 부분 (164~185) '/post/new'에서 post 방식으로 동작하는 라우터 부분.
 router.post("/post/new", isLoggedIn, upload.single("image"), (req, res) => {
     if (req.body.content) {
         let newPost = {};
         if (req.file) {
-            cloudinary.uploader.upload(req.file.path, result => {
+            // 새로운 게시글을 담을 newPost 객체에 images, creator, time, likes, content 속성을 입력한 뒤, createdPost()를 통해 새로운 Post를 하나 생성해줌
+            cloudinary.uploader.upload(req.file.path, result => {// cloudinary의 uploader.upload()메서드를 이용해서 받은 파일(req.file)을 업로드함. 
                 newPost.image = result.secure_url;
                 newPost.creator = req.user;
                 newPost.time = new Date();
@@ -192,7 +198,7 @@ function createPost(newPost, req, res) {
 }
 
 router.get("/post/:id", isLoggedIn, (req, res) => {
-    Post.findById(req.params.id)
+    Post.findById(req.params.id)// User 컬렉션에서 findById()를 통해서 사용자를 조회함
         .populate("comments")
         .exec((err, post) => {
             if (err) {
@@ -206,7 +212,7 @@ router.get("/post/:id", isLoggedIn, (req, res) => {
 });
 
 router.post("/post/:id/comments/new", isLoggedIn, (req, res) => {
-    Post.findById(req.params.id, (err, post) => {
+    Post.findById(req.params.id, (err, post) => {// User 컬렉션에서 findById()를 통해서 사용자를 조회함
         if (err) {
             console.log(err);
             req.flash("error", "There has been an error posting your comment");
